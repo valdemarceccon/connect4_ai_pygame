@@ -1,0 +1,3 @@
+PLAYER1 = 1
+PLAYER2 = 2
+EMPTY = 0

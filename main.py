@@ -4,6 +4,7 @@ import pygame
 import pygame.locals
 
 import config
+import constants
 import game
 
 
@@ -53,7 +54,12 @@ def main():
     state = game.Game()
 
     while True:
-        winner = state.is_over()
+        winner = None
+        if state.is_over(constants.PLAYER1):
+            winner = constants.PLAYER1
+        if state.is_over(constants.PLAYER2):
+            winner = constants.PLAYER2
+
         for event in pygame.event.get():
             if event.type == pygame.locals.QUIT:
                 pygame.quit()

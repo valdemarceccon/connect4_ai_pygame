@@ -1,12 +1,23 @@
 import config
-
-PLAYER1 = 1
-PLAYER2 = 2
-EMPTY = 0
+from constants import PLAYER1, PLAYER2, EMPTY
 
 
-def get_diags(arr):
-    return None
+def diagonals(arr: list[list[int]]) -> (list[int], list[int]):
+    h, w = len(arr), len(arr[0])
+    d1 = [[arr[h - p + q - 1][q]
+           for q in range(max(p - h + 1, 0), min(p + 1, w))]
+          for p in range(h + w - 1)]
+    d2 = [[arr[p - q][q]
+           for q in range(max(p - h + 1, 0), min(p + 1, w))]
+          for p in range(h + w - 1)]
+    return d1, d2
+
+
+def is_sublist(list1, list2):
+    for x in range(len(list1)):
+        if list1[x:x + len(list2)] == list2:
+            return True
+    return False
 
 
 class Game:
@@ -39,26 +50,17 @@ class Game:
         if x != -1:
             self.board[x][col] = player
 
-    def is_over(self):
-        lines = ["".join([str(c) for c in x]) for x in self.board]
+    def is_over(self, player):
+        rows = self.board
+        columns = [[c for c in x] for x in map(list, zip(*self.board))]
+        d1, d2 = diagonals(self.board)
 
-        for line in lines:
-            if str(PLAYER1) * 4 in line:
-                return PLAYER1
-            if str(PLAYER2) * 4 in line:
-                return PLAYER2
+        player_victory = [player for _ in range(4)]
+        result = any([is_sublist(v, player_victory) for v in rows]) or any(
+            [is_sublist(v, player_victory) for v in columns]) or any(
+            [is_sublist(v, player_victory) for v in d1]) or any([is_sublist(v, player_victory) for v in d2])
 
-        columns = ["".join([str(c) for c in x]) for x in map(list, zip(*self.board))]
-
-        for col in columns:
-            if str(PLAYER1) * 4 in col:
-                return PLAYER1
-            if str(PLAYER2) * 4 in col:
-                return PLAYER2
-
-        diags = get_diags(self.board)
-
-        return None
+        return result
 
     def move_left(self):
         self.col_selection -= 1

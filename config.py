@@ -1,4 +1,4 @@
-import game
+from constants import PLAYER1, PLAYER2, EMPTY
 
 
 class Board:
@@ -15,9 +15,9 @@ class Dimensions:
 
 class Player:
     COLOR = {
-        game.PLAYER1: (255, 255, 0),
-        game.PLAYER2: (255, 0, 0),
-        game.EMPTY: (255, 255, 255)
+        PLAYER1: (255, 255, 0),
+        PLAYER2: (255, 0, 0),
+        EMPTY: (255, 255, 255)
     }
 
 
