@@ -11,27 +11,32 @@ def possible_moves(game_state: game.Game):
     return [move for move in range(config.Dimensions.COLS) if not game_state.is_col_full(move)]
 
 
-def min_max(game_state: game.Game, maximizing_player, depth):
+def min_max(game_state: game.Game, maximizing_player, depth, alpha, beta):
     is_maximizing = maximizing_player == game_state.current_player
 
-    if depth <= 0:
+    if depth <= 0 or game_state.is_board_full():
         value = board_evaluation(game_state)
         return value if is_maximizing else -value
 
     if game_state.winner:
         return math.inf if is_maximizing else -math.inf
 
-    if game_state.is_board_full():
-        return 0
-
-    scores = []
+    val = -math.inf if is_maximizing else math.inf
     for c in possible_moves(game_state):
-        # copy_state = copy.deepcopy(game_state)
-        game_state.play(c)
-        scores.append(min_max(game_state, maximizing_player, depth - 1))
-        game_state.undo_play()
+        copy_state = copy.deepcopy(game_state)
+        copy_state.play(c)
+        if is_maximizing:
+            val = max(min_max(copy_state, maximizing_player, depth - 1, alpha, beta), val)
+            alpha = max(alpha, val)
+            if alpha >= beta:
+                break
+        else:
+            val = min(min_max(copy_state, maximizing_player, depth - 1, alpha, beta), val)
+            beta = min(beta, val)
+            if beta <= alpha:
+                break
 
-    return max(scores) if is_maximizing else min(scores)
+    return val
 
 
 def exec_best_move(game_state: game.Game):
@@ -41,7 +46,7 @@ def exec_best_move(game_state: game.Game):
     for c in possible_moves(game_state):
         copy_state = copy.deepcopy(game_state)
         copy_state.play(c)
-        score = min_max(copy_state, maximizing_player, config.THINKING_DEPTH)
+        score = min_max(copy_state, maximizing_player, config.THINKING_DEPTH, -math.inf, math.inf)
         if score > best_score:
             best_score = score
             best_move = c
@@ -79,6 +84,8 @@ def points_counter(values, target):
             best_found = max(9, best_found)
         if count_seq(window, target) == 2 and count_seq(window, constants.EMPTY) == 2:
             best_found = max(3, best_found)
+        if count_seq(window, target) == 1 and count_seq(window, constants.EMPTY) == 3:
+            best_found = max(2, best_found)
 
     return best_found
 
@@ -102,6 +109,3 @@ def windows(arr, size):
     width = len(arr)
     for c in range(width - size + 1):
         yield arr[c:c + size]
-
-
-
