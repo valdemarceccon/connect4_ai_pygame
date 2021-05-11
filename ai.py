@@ -1,8 +1,8 @@
 import copy
 import math
-import threading
 
 import config
+import constants
 import game
 import utils
 
@@ -16,7 +16,6 @@ def min_max(game_state: game.Game, maximizing_player, depth):
 
     if depth <= 0:
         value = board_evaluation(game_state)
-        value = value if value < 4 else math.inf
         return value if is_maximizing else -value
 
     if game_state.winner:
@@ -42,7 +41,7 @@ def exec_best_move(game_state: game.Game):
     for c in possible_moves(game_state):
         copy_state = copy.deepcopy(game_state)
         copy_state.play(c)
-        score = min_max(copy_state, maximizing_player, 5)
+        score = min_max(copy_state, maximizing_player, config.THINKING_DEPTH)
         if score > best_score:
             best_score = score
             best_move = c
@@ -53,17 +52,56 @@ def exec_best_move(game_state: game.Game):
     game_state.play(best_move)
 
 
-def think(game_state: game.Game):
-    threading.Thread
-
-
 def board_evaluation(state: game.Game):
-    for i in range(4)[::-1]:
-        sub_list = [state.current_player for _ in range(i)]
-        if utils.is_sublist(state.board, sub_list):
-            return i
-        if utils.is_sublist(utils.get_columns(state.board), sub_list):
-            return i
-        if utils.is_sublist(utils.diagonals(state.board), sub_list):
-            return i
-    return 0
+    curr_player = state.current_player
+    total = 0
+    max_found = 0
+    for line in state.board:
+        max_found = max(max_found, points_counter(line, curr_player))
+    total += max_found
+    max_found = 0
+    for col in utils.get_columns(state.board):
+        max_found = max(max_found, points_counter(col, curr_player))
+    total += max_found
+    max_found = 0
+    for diag in utils.diagonals(state.board):
+        max_found = max(max_found, points_counter(diag, curr_player))
+    total += max_found
+    return total
+
+
+def points_counter(values, target):
+    best_found = 1
+    for window in windows(values, 4):
+        if count_seq(window, target) == 4:
+            best_found = max(math.inf, best_found)
+        if count_seq(window, target) == 3 and count_seq(window, constants.EMPTY):
+            best_found = max(9, best_found)
+        if count_seq(window, target) == 2 and count_seq(window, constants.EMPTY) == 2:
+            best_found = max(3, best_found)
+
+    return best_found
+
+
+def count_seq(arr, target):
+    count = 0
+    m = 0
+    for i in arr:
+        if i == target:
+            count += 1
+        else:
+            m = max(count, m)
+            count = 0
+
+    return max(m, count)
+
+
+def windows(arr, size):
+    if len(arr) < size:
+        return None
+    width = len(arr)
+    for c in range(width - size + 1):
+        yield arr[c:c + size]
+
+
+

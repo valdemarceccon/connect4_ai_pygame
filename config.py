@@ -25,3 +25,5 @@ GAP = 20
 BORDER = 10
 HOLE_WIDTH = (Board.WIDTH - (2 * Board.BORDER + (Dimensions.COLS - 1) * GAP)) / Dimensions.COLS
 HOLE_HEIGHT = (Board.HEIGHT - (2 * Board.BORDER + (Dimensions.ROWS - 1) * GAP)) / Dimensions.ROWS
+
+THINKING_DEPTH = 2

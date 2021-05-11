@@ -60,12 +60,12 @@ class Game:
     def is_over(self, player):
         rows = self.board
         columns = get_columns(self.board)
-        d1, d2 = diagonals(self.board)
+        diags = diagonals(self.board)
 
         player_victory = [player for _ in range(4)]
         result = any([is_sublist(v, player_victory) for v in rows]) or any(
             [is_sublist(v, player_victory) for v in columns]) or any(
-            [is_sublist(v, player_victory) for v in d1]) or any([is_sublist(v, player_victory) for v in d2])
+            [is_sublist(v, player_victory) for v in diags])
 
         return result
 

@@ -6,7 +6,7 @@ def diagonals(arr: list[list[int]]) -> (list[int], list[int]):
     d2 = [[arr[p - q][q]
            for q in range(max(p - h + 1, 0), min(p + 1, w))]
           for p in range(h + w - 1)]
-    return d1, d2
+    return d1 + d2
 
 
 def get_columns(arr: list[list[int]]) -> list[list[int]]:
