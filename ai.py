@@ -51,35 +51,35 @@ def exec_best_move(game_state: game.Game):
             best_score = score
             best_move = c
 
-    if best_move is None:
+    if best_move is not None:
+        game_state.play(best_move)
+    else:
         game_state.play(possible_moves(game_state)[0])
-
-    game_state.play(best_move)
 
 
 def board_evaluation(state: game.Game):
     curr_player = state.current_player
     total = 0
-    max_found = 0
-    for line in state.board:
-        max_found = max(max_found, points_counter(line, curr_player))
-    total += max_found
-    max_found = 0
-    for col in utils.get_columns(state.board):
-        max_found = max(max_found, points_counter(col, curr_player))
-    total += max_found
-    max_found = 0
-    for diag in utils.diagonals(state.board):
-        max_found = max(max_found, points_counter(diag, curr_player))
-    total += max_found
+
+    total += max_points_in_all(state.board, curr_player)
+    total += max_points_in_all(utils.get_columns(state.board), curr_player)
+    total += max_points_in_all(utils.diagonals(state.board), curr_player)
+
     return total
+
+
+def max_points_in_all(lists, player):
+    max_found = 0
+    for sub_list in lists:
+        max_found = max(max_found, points_counter(sub_list, player))
+    return max_found
 
 
 def points_counter(values, target):
     best_found = 1
     for window in windows(values, 4):
         if count_seq(window, target) == 4:
-            best_found = max(math.inf, best_found)
+            return math.inf
         if count_seq(window, target) == 3 and count_seq(window, constants.EMPTY):
             best_found = max(9, best_found)
         if count_seq(window, target) == 2 and count_seq(window, constants.EMPTY) == 2:
